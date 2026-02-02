@@ -1,101 +1,67 @@
-// ----- Utilities -----
-const $ = (sel) => document.querySelector(sel);
+// Basic interactions for the five-file site
 
-// ----- Footer year -----
-const yearEl = $("#year");
-if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-// ----- Active nav link -----
-(function setActiveNav(){
-  const path = (location.pathname.split("/").pop() || "index.html").toLowerCase();
-  document.querySelectorAll(".nav-link").forEach(a => {
-    const href = (a.getAttribute("href") || "").toLowerCase();
-    if (href === path) a.classList.add("active");
+// Utility to set all year spans
+(function setYears(){
+  const y = new Date().getFullYear();
+  const ids = ['year','year-2','year-3'];
+  ids.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = y;
   });
 })();
 
-// ----- Theme toggle with persistence -----
-(function themeInit(){
-  const saved = localStorage.getItem("theme");
-  if (saved === "light" || saved === "dark") {
-    document.documentElement.setAttribute("data-theme", saved);
-  } else {
-    // default: dark
-    document.documentElement.setAttribute("data-theme", "dark");
-  }
-
-  const toggleBtn = $("#themeToggle");
-  if (!toggleBtn) return;
-
-  const syncLabel = () => {
-    const t = document.documentElement.getAttribute("data-theme");
-    toggleBtn.textContent = (t === "light") ? "☀️ Theme" : "🌙 Theme";
-  };
-
-  syncLabel();
-
-  toggleBtn.addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme");
-    const next = (current === "light") ? "dark" : "light";
-    document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("theme", next);
-    syncLabel();
-  });
-})();
-
-// ----- Home page: small interaction -----
-const statusText = $("#statusText");
-if (statusText) statusText.textContent = "Ready — exploring fundamentals.";
-
-const confettiBtn = $("#confettiBtn");
-if (confettiBtn) {
-  confettiBtn.addEventListener("click", () => {
-    // Lightweight celebration without libraries
-    const msg = document.createElement("div");
-    msg.textContent = "Nice! Keep shipping 🚀";
-    msg.style.position = "fixed";
-    msg.style.left = "50%";
-    msg.style.top = "20px";
-    msg.style.transform = "translateX(-50%)";
-    msg.style.padding = "10px 14px";
-    msg.style.borderRadius = "14px";
-    msg.style.border = "1px solid rgba(255,255,255,0.18)";
-    msg.style.background = "rgba(0,0,0,0.35)";
-    msg.style.backdropFilter = "blur(8px)";
-    msg.style.zIndex = "9999";
-    document.body.appendChild(msg);
-    setTimeout(() => msg.remove(), 1300);
+// Mobile nav toggle(s)
+function wireNav(toggleId, navId){
+  const btn = document.getElementById(toggleId);
+  const nav = document.getElementById(navId);
+  if(!btn || !nav) return;
+  btn.addEventListener('click', ()=>{
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    // use aria-hidden style hook
+    nav.style.display = expanded ? '' : 'block';
+    nav.setAttribute('aria-hidden', String(expanded));
   });
 }
 
-// ----- Contact form: client-only validation + feedback -----
-const form = $("#contactForm");
-const feedback = $("#formFeedback");
+// wire up the three header toggles (one per page copy)
+wireNav('nav-toggle','site-nav');
+wireNav('nav-toggle-2','site-nav-2');
+wireNav('nav-toggle-3','site-nav-3');
 
-if (form && feedback) {
-  form.addEventListener("submit", (e) => {
+// Contact form: client-side validation & fake submit
+(function(){
+  const form = document.getElementById('contact-form');
+  if(!form) return;
+
+  const status = document.getElementById('form-status');
+  form.addEventListener('submit', function(e){
     e.preventDefault();
-    feedback.className = "feedback";
+    status.textContent = '';
+    const data = new FormData(form);
+    const name = (data.get('name') || '').toString().trim();
+    const email = (data.get('email') || '').toString().trim();
+    const message = (data.get('message') || '').toString().trim();
 
-    const name = $("#name")?.value.trim();
-    const email = $("#email")?.value.trim();
-    const message = $("#message")?.value.trim();
-
-    if (!name || !email || !message) {
-      feedback.textContent = "Please fill out name, email, and message.";
-      feedback.classList.add("err");
+    // basic checks
+    if(name.length < 2){
+      status.textContent = 'Please enter your name (at least 2 characters).';
+      return;
+    }
+    if(!/^\S+@\S+\.\S+$/.test(email)){
+      status.textContent = 'Please enter a valid email address.';
+      return;
+    }
+    if(message.length < 10){
+      status.textContent = 'Please enter a longer message (10+ characters).';
       return;
     }
 
-    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    if (!emailOk) {
-      feedback.textContent = "Please enter a valid email address.";
-      feedback.classList.add("err");
-      return;
-    }
-
-    feedback.textContent = "Message ready (frontend-only). Backend connection will be added later.";
-    feedback.classList.add("ok");
-    form.reset();
+    // fake submit: show loading, then success
+    status.textContent = 'Sending…';
+    setTimeout(()=>{
+      status.textContent = 'Thanks — your message was received (demo).';
+      form.reset();
+    }, 700);
   });
-}
+})();

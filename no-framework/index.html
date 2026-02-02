@@ -2,98 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nitin Yeruva | Home</title>
-  <meta name="description" content="No-framework course website: portfolio, course progress, and project highlights." />
-  styles.css
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simple Five-File Website — Home</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
   <header class="site-header">
-    index.html
-      <span class="brand-mark">NY</span>
-      <span class="brand-text">Nitin Yeruva</span>
-    </a>
-
-    <nav class="nav" aria-label="Primary navigation">
-      <a class="nav-link" href="bout.htmlAbout</a>
-      contact.htmlContact</a>
-    </nav>
-
-    <button id="themeToggle" class="button button-ghost" type="button" aria-label="Toggle theme">
-      🌙 Theme
-    </button>
+    <div class="container header-inner">
+      <a class="brand" href="index.html">FiveFileSite</a>
+      <button id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="site-nav">☰</button>
+      <nav id="site-nav" class="site-nav" role="navigation">
+        <ul>
+          <li><a href="index.html" aria-current="page">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
   <main class="container">
     <section class="hero">
-      <div class="hero-text">
-        <p class="badge">Web Server Development • No Framework</p>
-        <h1 class="title">Building strong fundamentals, one commit at a time.</h1>
-        <p class="subtitle">
-          This site is part of my course repository. It’s a lightweight, framework-free starter
-          that I’ll expand as we learn more about the web, servers, and full-stack development.
-        </p>
-
-        <div class="cta-row">
-          about.htmlLearn more about me</a>
-          contact.htmlGet in touch</a>
-        </div>
-      </div>
-
-      <div class="hero-card">
-        <h2 class="card-title">Quick Snapshot</h2>
-        <ul class="list">
-          <li><strong>Focus:</strong> Clean UI + solid structure</li>
-          <li><strong>Tools:</strong> HTML, CSS, JavaScript</li>
-          <li><strong>Goal:</strong> Ready to evolve into Node.js</li>
-        </ul>
-
-        <div class="status">
-          <span class="dot" aria-hidden="true"></span>
-          <span id="statusText">Site loaded</span>
-        </div>
-      </div>
+      <h1>Welcome to the Five-File Website</h1>
+      <p class="lead">A small, clean, responsive starter site using only five files: three HTML pages, one CSS, and one JS file.</p>
+      <p><a class="btn" href="about.html">Learn more</a> <a class="btn secondary" href="contact.html">Contact us</a></p>
     </section>
 
-    <section class="grid">
-      <article class="panel">
-        <h2>What I’m working on</h2>
-        <p>
-          Each week, I’ll add new assignments and improvements here. The design is intentionally simple,
-          so I can focus on correctness, accessibility, and maintainability.
-        </p>
-        about.htmlSee background →</a>
+    <section class="features">
+      <article class="card">
+        <h2>Responsive</h2>
+        <p>Mobile-first layout that works on phones, tablets, and desktops.</p>
       </article>
 
-      <article class="panel">
-        <h2>Mini Projects</h2>
-        <p>
-          I’ll keep a running list of small experiments (UI components, form validation, fetch demos, etc.).
-        </p>
-        <ul class="list compact">
-          <li>Theme toggle + saved preference</li>
-          <li>Active navigation highlight</li>
-          <li>Form UI + client-side validation (next)</li>
-        </ul>
+      <article class="card">
+        <h2>Accessible</h2>
+        <p>Semantic HTML, keyboard-friendly menu, and clear focus styles.</p>
       </article>
 
-      <article class="panel">
-        <h2>Next steps</h2>
-        <p>
-          As we progress, this will turn into a more complete web app with backend routes, APIs, and data persistence.
-        </p>
-        <button id="confettiBtn" class="button button-small" type="button">Celebrate progress 🎉</button>
+      <article class="card">
+        <h2>Easy to Customize</h2>
+        <p>Five files only — edit text, colors, or add assets to suit your needs.</p>
       </article>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>
-      © <span id="year"></span> Nitin Yeruva • Built with HTML/CSS/JS (no framework)
-    </p>
+    <div class="container">
+      <p>© <span id="year"></span> FiveFileSite — Built with HTML, CSS & JavaScript.</p>
+    </div>
   </footer>
 
-  script.js</script>
+  <script src="script.js"></script>
 </body>
 </html>

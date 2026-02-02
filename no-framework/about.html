@@ -2,79 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nitin Yeruva | About</title>
-  <meta name="description" content="About Nitin Yeruva: background, experience, and course goals." />
-  <link rel="stylesheet" href="<header class="site-header">
-    <a class="brand" href="index.html" aria-label="pan>
-      <span class="brand-text">Nitin Yeruva</span>
-    </a>
-
-    <nav class="nav" aria-label="Primary navigation">
-      <a class="nave</a>
-      about.htmlAbout</a>
-      <a class="nav-link" href    </nav>
-
-    <button id="themeToggle" class="button button-ghost" type="button" aria-label="Toggle theme">
-      🌙 Theme
-    </button>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>About — FiveFileSite</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">FiveFileSite</a>
+      <button id="nav-toggle-2" class="nav-toggle" aria-expanded="false" aria-controls="site-nav-2">☰</button>
+      <nav id="site-nav-2" class="site-nav" role="navigation">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html" aria-current="page">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main class="container">
-    <section class="page-header">
-      <h1 class="title">About Me</h1>
-      <p class="subtitle">
-        A quick overview of my background and how I plan to use what we learn in this course.
-      </p>
-    </section>
+  <main class="container narrow">
+    <article class="content">
+      <h1>About This Site</h1>
+      <p>This small site is a template demonstrating a minimal structure suitable for small projects, portfolios, or learning exercises. It uses plain HTML, a single stylesheet, and a single JavaScript file to keep things simple.</p>
 
-    <section class="panel">
-      <h2>Background</h2>
-      <p>
-        My name is <strong>Nitin Reddy Yeruva</strong>. I’m a Computer Science graduate student at
-        <strong>SUNY New Paltz</strong>. I completed my undergraduate degree in Computer Science Engineering
-        with a specialization in <strong>Data Science</strong> in Hyderabad, India.
-      </p>
-      <p>
-        Beyond technical work, I’ve built leadership experience as the <strong>Technical Head</strong> at
-        The Arts Club at SNIST, helping organize large-scale cultural events for thousands of students.
-      </p>
-    </section>
+      <h2>Design Goals</h2>
+      <ul>
+        <li>Small footprint (only five files)</li>
+        <li>Clear structure and accessible markup</li>
+        <li>Responsive layout with simple components</li>
+      </ul>
 
-    <section class="grid two">
-      <article class="panel">
-        <h2>Computer Experience</h2>
-        <p>
-          I’ve taken coursework in Data Structures & Algorithms, SQL, and Java, and I’m comfortable with
-          Python, C, and SQL. I’ve used Git and VS Code in multiple projects including churn prediction
-          using XGBoost, audio-based classification, and ML approaches for crop yield prediction.
-        </p>
-      </article>
-
-      <article class="panel">
-        <h2>How I’ll Use This Course</h2>
-        <p>
-          I want to close the gap between front-end user experience and back-end data processing. The goal
-          is to build applications that are technically strong, organized, and user-friendly. These skills
-          will help me present data science work in a more accessible and professional way.
-        </p>
-      </article>
-    </section>
-
-    <section class="panel">
-      <h2>Course Milestones</h2>
-      <ol class="list">
-        <li><strong>No framework:</strong> HTML/CSS/JS fundamentals and clean structure</li>
-        <li><strong>Node.js:</strong> servers, routing, APIs</li>
-        <li><strong>Final project:</strong> full-stack app with polished UX</li>
-      </ol>
-    </section>
+      <h2>How to customize</h2>
+      <p>Edit <code>styles.css</code> for visual changes, modify the HTML files for content and structure, and extend behavior in <code>script.js</code>.</p>
+    </article>
   </main>
 
   <footer class="site-footer">
-    <p>© <span id="year"></span> Nitin Yeruva</p>
+    <div class="container">
+      <p>© <span id="year-2"></span> FiveFileSite</p>
+    </div>
   </footer>
 
-  script.js</script>
+  <script src="script.js"></script>
 </body>
 </html>

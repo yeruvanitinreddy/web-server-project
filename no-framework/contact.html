@@ -2,78 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nitin Yeruva | Contact</title>
-  <meta name="description" content="Contact page with a simple no-framework form." />
-  styles.css
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contact — FiveFileSite</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
   <header class="site-header">
-    index.html
-      <span class="brand-mark">NY</span>
-      <span class="brand-text">Nitin Yeruva</span>
-    </a>
-
-    <nav class="nav" aria-label="Primary navigation">
-      <a class="nav-link" href about.htmlAbout</a>
-      contact.htmlContact</a>
-    </nav>
-
-    <button id="themeToggle" class="button button-ghost" type="button" aria-label="Toggle theme">
-      🌙 Theme
-    </button>
+    <div class="container header-inner">
+      <a class="brand" href="index.html">FiveFileSite</a>
+      <button id="nav-toggle-3" class="nav-toggle" aria-expanded="false" aria-controls="site-nav-3">☰</button>
+      <nav id="site-nav-3" class="site-nav" role="navigation">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html" aria-current="page">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
-  <main class="container">
-    <section class="page-header">
-      <h1 class="title">Contact</h1>
-      <p class="subtitle">
-        This form is front-end only for now. Later in the course, I’ll connect it to a backend route.
-      </p>
-    </section>
+  <main class="container narrow">
+    <article class="content">
+      <h1>Contact Us</h1>
+      <p>If you want to test the contact form locally, it uses client-side validation and shows a success message — it does not send emails (no backend required).</p>
 
-    <section class="panel">
-      <form id="contactForm" class="form" novalidate>
-        <div class="field">
-          <label for="name">Name</label>
-          <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" required />
-          <small class="hint">Required</small>
+      <form id="contact-form" novalidate>
+        <label for="name">Name</label>
+        <input id="name" name="name" type="text" required minlength="2" />
+
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" required />
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="6" required minlength="10"></textarea>
+
+        <div class="form-actions">
+          <button type="submit" class="btn">Send</button>
+          <button type="reset" class="btn secondary">Reset</button>
         </div>
 
-        <div class="field">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
-          <small class="hint">Required</small>
-        </div>
-
-        <div class="field">
-          <label for="message">Message</label>
-          <textarea id="message" name="message" rows="5" placeholder="Write your message..." required></textarea>
-          <small class="hint">Required</small>
-        </div>
-
-        <button class="button" type="submit">Send message</button>
-
-        <p id="formFeedback" class="feedback" role="status" aria-live="polite"></p>
+        <p id="form-status" class="form-status" aria-live="polite"></p>
       </form>
-    </section>
-
-    <section class="panel">
-      <h2>Other ways</h2>
-      <p>
-        If your instructor wants contact info visible, you can add it here. Otherwise, you can keep it minimal.
-      </p>
-      <ul class="list compact">
-        <li>GitHub: <span class="muted">yeruvanitinreddy</span></li>
-        <li>Location: <span class="muted">New Paltz, NY</span></li>
-      </ul>
-    </section>
+    </article>
   </main>
 
   <footer class="site-footer">
-    <p>© <span id="year"></span> Nitin Yeruva</p>
+    <div class="container">
+      <p>© <span id="year-3"></span> FiveFileSite</p>
+    </div>
   </footer>
 
-  <script src="script</body>
+  <script src="script.js"></script>
+</body>
 </html>
