@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nitin Yeruva | Contact</title>
+  <meta name="description" content="Contact page with a simple no-framework form." />
+  styles.css
+</head>
+
+<body>
+  <header class="site-header">
+    index.html
+      <span class="brand-mark">NY</span>
+      <span class="brand-text">Nitin Yeruva</span>
+    </a>
+
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="nav-link" href about.htmlAbout</a>
+      contact.htmlContact</a>
+    </nav>
+
+    <button id="themeToggle" class="button button-ghost" type="button" aria-label="Toggle theme">
+      🌙 Theme
+    </button>
+  </header>
+
+  <main class="container">
+    <section class="page-header">
+      <h1 class="title">Contact</h1>
+      <p class="subtitle">
+        This form is front-end only for now. Later in the course, I’ll connect it to a backend route.
+      </p>
+    </section>
+
+    <section class="panel">
+      <form id="contactForm" class="form" novalidate>
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" autocomplete="name" placeholder="Your name" required />
+          <small class="hint">Required</small>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required />
+          <small class="hint">Required</small>
+        </div>
+
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="Write your message..." required></textarea>
+          <small class="hint">Required</small>
+        </div>
+
+        <button class="button" type="submit">Send message</button>
+
+        <p id="formFeedback" class="feedback" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Other ways</h2>
+      <p>
+        If your instructor wants contact info visible, you can add it here. Otherwise, you can keep it minimal.
+      </p>
+      <ul class="list compact">
+        <li>GitHub: <span class="muted">yeruvanitinreddy</span></li>
+        <li>Location: <span class="muted">New Paltz, NY</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> Nitin Yeruva</p>
+  </footer>
+
+  <script src="script</body>
+</html>
