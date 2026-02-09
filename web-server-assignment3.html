@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+        <nav class="menu">
+            <div class="dropdown">
+                <button><b>FILE</b></button>
+                <div class="drop">
+                   <a href="">New</a>
+                   <a href="">Open</a>
+                   <a href="">Save</a>
+                   <a href="">Save As</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <div class="credit">
+               <button>EDIT</button>
+                <div class="drop">
+                   <a href="">Undo</a>
+                   <a href="">Cut</a>
+                   <a href="">Paste</a>
+                   <a href="">Delete</a>
+                </div>
+                </div>
+            </div>
+            <div class="dropdown">
+               <button><b>VIEW</b></button>
+                <div class="drop">
+                    <a href="">Zoom In</a>
+                    <a href="">Zoom Out</a>
+                    <a href="">Actual Size</a>
+                    <a href="">Fit Page</a>
+                    <a href="">Fit Width</a>
+                    <a href="">Fit Height</a> 
+                    <a href="">Rotate Left </a>
+                    <a href="">Rotate Right</a>
+                    <a href="">Full Screen</a>
+                </div>
+            </div>
+        </nav>
+        <div class="content">
+            <h2>Instructions</h2>
+            <p>Recreate this page using <i><b>only CSS</b></i>. Do yourself a favor and 1) Do not view the source. Figure it out yourself. 2) Do not search for the solution. Learn CSS until you know enough to do this.</p>
+        </div>
+        <div class="content2">
+            <h2>Extra Credit</h2>
+            <p>Notice how the Edit menu (besides for not being bold) reacts to clicks. If you click the edit menu, it remains open until you click somewhere else. (This you might need to search for)</p>    
+        </div>
+</body>
+</html>
+
+<style>
+    body{
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        }
+    .menu {
+        display: flex; 
+        flex-direction: row;
+        background-color:green;
+        padding: 0;
+        position: relative;
+        z-index: 1000;
+    }  
+
+    .dropdown {
+        position: relative;
+    }
+
+.dropdown button{
+    background: transparent;
+    border: none;
+    color: black;
+    font-size: 16px;
+    padding: 14px 16px;
+    cursor: pointer;
+    border-radius: 1px;
+}
+    .drop {
+        display: none;
+        position: absolute;
+        left: 0;
+        background-color: lightgreen;
+        min-width: 160px;
+    }
+    .dropdown:hover .drop {
+        display: block;
+    }
+    .drop a {
+        display: block;
+        color: black;
+        text-decoration: none;
+        padding: 12px 16px;
+    }
+    .drop a:hover {
+        background-color: #d7d14d;
+    }
+    .credit:focus-within .drop {
+        display: block;
+        
+    }
+    
+.content {
+    background: white;
+    border: 1px solid #ccc;
+    border-left: 6px solid #4caf50;
+    margin: 20px;
+    padding: 16px;
+    position: relative;
+}
+.content2 {
+    background: white;
+    border: 1px solid #ccc;
+    border-left: 6px solid #ffeb3b;
+    margin: 20px;
+    padding: 16px;
+    position: relative;
+}
+.content h2,.content2 h2 {
+    margin-bottom: 10px;
+}
+.content p,.content2 p {
+    line-height: 1.4;
+}
