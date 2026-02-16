@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <title>My Bulma Todo Page</title>
+</head>
+<body>
+    <nav class="navbar is-primary">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="#">
+            <img src="https://bulma.io/images/bulma-logo-white.png" alt="Bulma Logo" width="112" height="28">
+          </a>
+          <div class="navbar-burger" data-target="navMenu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      
+        <div id="navMenu" class="navbar-menu">
+          <div class="navbar-start">
+            <a class="navbar-item" href="#">
+              Home
+            </a>
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link" href="#">
+                Documentation
+              </a>
+              <div class="navbar-dropdown">
+                <a class="navbar-item" href="#">
+                  Getting Started
+                </a>
+                <a class="navbar-item" href="#">
+                  Components
+                </a>
+                <a class="navbar-item" href="#">
+                  Elements
+                </a>
+                <hr class="navbar-divider">
+                <a class="navbar-item" href="#">
+                  Examples
+                </a>
+              </div>
+            </div>
+          </div>
+      
+          <div class="navbar-end">
+            <div class="navbar-item">
+              <div class="field is-grouped">
+                <p class="control">
+                  <a class="bd-tw-button button" data-social-network="Twitter" data-social-action="tweet" data-social-target="https://bulma.io" target="_blank" href="https://twitter.com/intent/tweet?text=Bulma: a modern CSS framework based on Flexbox&amp;hashtags=bulmaio&amp;url=https://bulma.io&amp;via=jgthms">
+                    <span class="icon">
+                      <i class="fab fa-twitter"></i>
+                    </span>
+                    <span>Tweet</span>
+                  </a>
+                </p>
+                <p class="control">
+                  <a class="button is-primary" href="https://github.com/jgthms/bulma/releases/download/0.9.3/bulma-0.9.3.zip">
+                    <span class="icon">
+                      <i class="fas fa-download"></i>
+                    </span>
+                    <span>Download</span>
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Section -->
+    <div class="section">
+        <div class="container">
+          <div class="columns">
+              <!-- Left Sidebar -->
+              <div class="column is-one-quarter">
+                  <div class="card">
+                      <header class="card-header">
+                        <p class="card-header-title">
+                          Component
+                        </p>
+                        <button class="card-header-icon" aria-label="more options">
+                          <span class="icon">
+                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                          </span>
+                        </button>
+                      </header>
+                      <div class="card-content">
+                        <div class="content">
+                          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec iaculis mauris.
+                          <a href="#">@bulmaio.</a>. <a href="#">#css</a> <a href="#">#responsive</a>
+                          <br>
+                          <time datetime="2026-2-15">Today</time>
+                        </div>
+                      </div>
+                      <footer class="card-footer">
+                        <a href="#" class="card-footer-item">Save</a>
+                        <a href="#" class="card-footer-item">Edit</a>
+                        <a href="#" class="card-footer-item">Delete</a>
+                      </footer>
+                  </div>
+              </div>
+
+              <!-- Center Content -->
+              <div class="column is-half">
+                  <article class="panel">
+                      <!-- Tabs -->
+                      <div class="tabs is-boxed">
+                          <ul>
+                            <li class="is-active">
+                              <a>
+                                <span class="icon is-small"><i class="fas fa-tasks"></i></span>
+                                <span>Active Tasks</span>
+                              </a>
+                            </li>
+                            <li>
+                              <a>
+                                <span class="icon is-small"><i class="fas fa-check-double"></i></span>
+                                <span>Done</span>
+                              </a>
+                            </li>
+                            <li>
+                              <a>
+                                <span class="icon is-small"><i class="fas fa-hourglass-half"></i></span>
+                                <span>Pending</span>
+                              </a>
+                            </li>
+                            <li>
+                              <a>
+                                <span class="icon is-small"><i class="fas fa-list"></i></span>
+                                <span>View All</span>
+                              </a>
+                            </li>
+                          </ul>
+                      </div>
+
+                      <!-- Input for new task -->
+                      <div class="panel-block">
+                        <p class="control has-icons-left">
+                          <input class="input is-info" type="text" placeholder="Add new task here...">
+                          <span class="icon is-left">
+                            <i class="fas fa-plus-circle" aria-hidden="true"></i>
+                          </span>
+                        </p>
+                      </div>
+
+                      <!-- Todo items -->
+                      <a class="panel-block">
+                          <input type="checkbox" checked />
+                          Make Bulma great again
+                      </a>
+                      <a class="panel-block">
+                          <input type="checkbox" />
+                          Add some more features
+                      </a>
+                      <a class="panel-block">
+                          <input type="checkbox" />
+                          Make a github account
+                      </a>
+                      <a class="panel-block">
+                          <input type="checkbox" />
+                          Learn how to use github
+                      </a>
+                      <a class="panel-block">
+                          <input type="checkbox" />
+                          add a .gitignore file
+                      </a>
+                  </article>
+
+                  <!-- Message Box -->
+                  <article class="message is-success">
+                      <div class="message-header">
+                        <p>Make a github account</p>
+                        <button class="delete" aria-label="delete"></button>
+                      </div>
+                      <div class="message-body">
+                        <p>Go to <a href="https://github.com">github.com</a> and create an account.</p>
+                        <p>
+                          That's where you'll be able to share your work with the world.. thats where we will be putting all of our code for this class.
+                        </p>
+                        <progress class="progress is-primary" value="75" max="100">75%</progress>
+                      </div>
+                  </article>
+
+                  <!-- Contact Form -->
+                  <form action="" class="box">
+                      <div class="field">
+                          <label class="label">Name</label>
+                          <div class="control">
+                            <input class="input" type="text" placeholder="Enter your name">
+                          </div>
+                      </div>
+                      
+                      <div class="field">
+                          <label class="label">Username</label>
+                          <div class="control has-icons-left has-icons-right">
+                            <input class="input is-success" type="text" placeholder="Text input" value="bulma">
+                            <span class="icon is-small is-left">
+                              <i class="fas fa-id-card"></i>
+                            </span>
+                            <span class="icon is-small is-right">
+                              <i class="fas fa-check"></i>
+                            </span>
+                          </div>
+                          <p class="help is-success">The username is available</p>
+                      </div>
+                      
+                      <div class="field">
+                          <label class="label">Email</label>
+                          <div class="control has-icons-left has-icons-right">
+                            <input class="input is-danger" type="email" placeholder="your.email@" value="test@">
+                            <span class="icon is-small is-left">
+                              <i class="fas fa-envelope"></i>
+                            </span>
+                            <span class="icon is-small is-right">
+                              <i class="fas fa-exclamation-triangle"></i>
+                            </span>
+                          </div>
+                          <p class="help is-danger">Please enter a valid email</p>
+                      </div>
+                      
+                      <div class="field">
+                          <label class="label">Subject</label>
+                          <div class="control">
+                            <div class="select">
+                              <select>
+                                <option>Choose a course</option>
+                                <option>Web Development</option>
+                                <option>Data Structures</option>
+                                <option>Algorithms</option>
+                              </select>
+                            </div>
+                          </div>
+                      </div>
+                      
+                      <div class="field">
+                          <label class="label">Message</label>
+                          <div class="control">
+                            <textarea class="textarea" placeholder="Your message here..."></textarea>
+                          </div>
+                      </div>
+                      
+                      <div class="field">
+                          <div class="control">
+                            <label class="checkbox">
+                              <input type="checkbox">
+                              I accept the <a href="#">terms and conditions</a>
+                            </label>
+                          </div>
+                      </div>
+                      
+                      <div class="field">
+                          <div class="control">
+                            <label class="radio">
+                              <input type="radio" name="enrollment">
+                              Yes
+                            </label>
+                            <label class="radio">
+                              <input type="radio" name="enrollment">
+                              No
+                            </label>
+                          </div>
+                      </div>
+                      
+                      <div class="field is-grouped">
+                          <div class="control">
+                            <button class="button is-primary">Send</button>
+                          </div>
+                          <div class="control">
+                            <button class="button is-light">Clear</button>
+                          </div>
+                      </div>
+                  </form>
+              </div>
+
+              <!-- Right Sidebar -->
+              <div class="column is-one-quarter">
+                  <h2 class="title">Table of Contents</h2>
+                  <h3 class="subtitle">Intra-page navigation</h3>
+                  <aside class="menu">
+                      <p class="menu-label">
+                        General
+                      </p>
+                      <ul class="menu-list">
+                        <li><a>Dashboard</a></li>
+                        <li><a>Customers</a></li>
+                      </ul>
+                      <p class="menu-label">
+                        ADMINISTRATION
+                      </p>
+                      <ul class="menu-list">
+                        <li><a>Team Settings</a></li>
+                        <li>
+                          <a class="is-active">Manage Your Team</a>
+                          <ul>
+                            <li><a>Members</a></li>
+                            <li><a>Plugins</a></li>
+                            <li><a>Add a member</a></li>
+                          </ul>
+                        </li>
+                        <li><a>Invitations</a></li>
+                        <li><a>Cloud Storage Environment Settings</a></li>
+                        <li><a>Authentication</a></li>
+                      </ul>
+                      <p class="menu-label">
+                        TRANSACTIONS
+                      </p>
+                      <ul class="menu-list">
+                        <li><a>Payments</a></li>
+                        <li><a>Transfers</a></li>
+                        <li><a>Balance</a></li>
+                      </ul>
+                  </aside>
+              </div>
+          </div>
+        </div>
+    </div>
+</body>
+</html>
