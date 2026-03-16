@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import type { Activity, ActivityType } from '@/types'
 import { useActivitiesStore, activityTypeLabels } from '@/stores/activities'
-import { parse } from 'path'
+//import { parse } from 'path'
 
 const activitiesStore = useActivitiesStore()
 
