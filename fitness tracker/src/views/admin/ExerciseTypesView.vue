@@ -64,9 +64,13 @@ function cancelEdit() {
 async function saveEdit() {
   if (!editDraft.value) return
   error.value = null
+  if (!editDraft.value.name.trim()) {
+    error.value = 'Please provide an exercise type name.'
+    return
+  }
   try {
     if (!auth.token) throw new Error('Not authenticated')
-    const saved = await updateExerciseType(auth.token, editDraft.value)
+    const saved = await updateExerciseType(auth.token, { ...editDraft.value, name: editDraft.value.name.trim() })
     exerciseTypes.value = exerciseTypes.value.map((t) => (t.id === saved.id ? saved : t))
     cancelEdit()
   } catch (err) {

@@ -74,10 +74,8 @@ async function saveEdit() {
 
   error.value = null
   try {
-    const payload: User = { ...editDraft.value }
-    if (!payload.password) {
-      delete payload.password
-    }
+    const { password, ...rest } = editDraft.value
+    const payload: User = password ? { ...rest, password } : (rest as User)
     await usersStore.updateUser(payload)
     cancelEdit()
   } catch (err) {

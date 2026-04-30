@@ -5,6 +5,13 @@ const rateLimit = require('express-rate-limit')
 
 dotenv.config()
 
+const requiredEnv = ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'JWT_SECRET']
+const missingEnv = requiredEnv.filter((key) => !process.env[key])
+if (missingEnv.length > 0) {
+  console.error(`Missing required environment variables: ${missingEnv.join(', ')}`)
+  process.exit(1)
+}
+
 const app = express()
 
 app.use(cors())
