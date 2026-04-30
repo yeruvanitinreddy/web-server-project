@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
-import type { Activity, ActivityType } from '@/types'
+import type { Activity, ActivityType, ExerciseType } from '@/types'
 import { useActivitiesStore } from '@/stores/activities'
-import { supabase } from '@/lib/supabase'
+import { useAuthStore } from '@/stores/auth'
+import { fetchExerciseTypes } from '@/api/exerciseTypes'
 
 const activitiesStore = useActivitiesStore()
+const auth = useAuthStore()
 
 const type = ref<ActivityType>('run')
 const minutes = ref<number>(30)
@@ -12,6 +14,7 @@ const date = ref<string>(new Date().toISOString().slice(0, 10))
 const notes = ref<string>('')
 
 const error = ref<string | null>(null)
+const loading = ref(false)
 
 const activityTypeOptions = ref<{ value: ActivityType; label: string }[]>([])
 
@@ -20,23 +23,31 @@ function normalizeType(name: string): ActivityType {
   return key as ActivityType
 }
 
-onMounted(async () => {
-  const { data, error } = await supabase.from('ExerciseTypes').select('name').order('name')
+async function loadData() {
+  error.value = null
+  loading.value = true
 
-  if (error) {
-    console.error(error)
-    return
+  try {
+    await activitiesStore.loadActivities()
+    if (!auth.token) throw new Error('Not authenticated')
+
+    const types = await fetchExerciseTypes(auth.token)
+    activityTypeOptions.value = (types ?? []).map((row: ExerciseType) => ({
+      value: normalizeType(row.name),
+      label: row.name,
+    }))
+
+    if (!activityTypeOptions.value.find((o) => o.value === type.value)) {
+      type.value = activityTypeOptions.value[0]?.value ?? 'run'
+    }
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to load activities.'
+  } finally {
+    loading.value = false
   }
+}
 
-  activityTypeOptions.value = (data ?? []).map((row) => ({
-    value: normalizeType(row.name),
-    label: row.name,
-  }))
-
-  if (!activityTypeOptions.value.find((o) => o.value === type.value)) {
-    type.value = activityTypeOptions.value[0]?.value ?? 'run'
-  }
-})
+onMounted(loadData)
 
 const activityTypeLabelByValue = computed(
   () =>
@@ -56,7 +67,7 @@ function resetForm() {
   notes.value = ''
 }
 
-function add() {
+async function add() {
   error.value = null
 
   if (!date.value) {
@@ -68,14 +79,18 @@ function add() {
     return
   }
 
-  activitiesStore.addActivity({
-    type: type.value,
-    minutes: minutes.value,
-    date: date.value,
-    notes: notes.value.trim() ? notes.value.trim() : undefined,
-  })
+  try {
+    await activitiesStore.addActivity({
+      type: type.value,
+      minutes: minutes.value,
+      date: date.value,
+      notes: notes.value.trim() ? notes.value.trim() : undefined,
+    })
 
-  resetForm()
+    resetForm()
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to add activity.'
+  }
 }
 
 function startEdit(a: Activity) {
@@ -88,7 +103,7 @@ function cancelEdit() {
   editDraft.value = null
 }
 
-function saveEdit() {
+async function saveEdit() {
   if (!editDraft.value) return
 
   if (!editDraft.value.date) {
@@ -100,14 +115,22 @@ function saveEdit() {
     return
   }
 
-  activitiesStore.updateActivity(editDraft.value)
-  cancelEdit()
+  try {
+    await activitiesStore.updateActivity(editDraft.value)
+    cancelEdit()
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to update activity.'
+  }
 }
 
-function remove(id: number) {
+async function remove(id: number) {
   const ok = confirm('Delete this activity?')
   if (!ok) return
-  activitiesStore.deleteActivity(id)
+  try {
+    await activitiesStore.deleteActivity(id)
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Failed to delete activity.'
+  }
 }
 </script>
 
@@ -118,7 +141,7 @@ function remove(id: number) {
         <div class="level-left">
           <div>
             <h1 class="title">My Activities</h1>
-            <p class="subtitle">Add, edit, and delete your workouts (in-memory).</p>
+            <p class="subtitle">Add, edit, and delete your workouts.</p>
           </div>
         </div>
 
@@ -130,6 +153,8 @@ function remove(id: number) {
       <div v-if="error" class="notification is-danger is-light">
         {{ error }}
       </div>
+
+      <div v-if="loading" class="notification is-info is-light">Loading activities...</div>
 
       <div class="box">
         <h2 class="title is-5">Add Activity</h2>

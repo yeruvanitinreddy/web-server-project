@@ -5,11 +5,16 @@ export type User = {
   firstName: string
   lastName: string
   username: string
-  password: string
+  password?: string
   role: Role
 }
 
-export type ActivityType = 'run' | 'walk' | 'bike' | 'strength_training' | 'dance'
+export type ActivityType = string
+
+export type ExerciseType = {
+  id: number
+  name: string
+}
 
 export type Activity = {
   id: number

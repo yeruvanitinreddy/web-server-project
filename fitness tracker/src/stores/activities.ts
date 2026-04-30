@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Activity, ActivityType } from '@/types'
-import { seedActivities } from '@/data/seed'
+import { createActivity, deleteActivity, fetchActivities, updateActivity } from '@/api/activities'
 import { useAuthStore } from './auth'
 
-export const activityTypeLabels: Record<ActivityType, string> = {
+export const activityTypeLabels: Record<string, string> = {
   run: 'Run',
   walk: 'Walk',
   bike: 'Bike',
@@ -13,7 +13,7 @@ export const activityTypeLabels: Record<ActivityType, string> = {
 }
 
 export const useActivitiesStore = defineStore('activities', () => {
-  const activities = ref<Activity[]>(JSON.parse(JSON.stringify(seedActivities)))
+  const activities = ref<Activity[]>([])
   const auth = useAuthStore()
 
   const myActivities = computed(() => {
@@ -25,25 +25,38 @@ export const useActivitiesStore = defineStore('activities', () => {
       .sort((a, b) => b.date.localeCompare(a.date))
   })
 
-  function addActivity(activity: { type: ActivityType; minutes: number; date: string; notes?: string }) {
-    const me = auth.currentUser
-    if (!me) throw new Error('Not authenticated')
-
-    const nextId = Math.max(...activities.value.map(a => a.id), 0) + 1
-    activities.value.push({
-      id: nextId,
-      userId: me.id,
-      ...activity,
-    })
+  async function loadActivities() {
+    if (!auth.token) {
+      activities.value = []
+      return
+    }
+    activities.value = await fetchActivities(auth.token)
   }
 
-  function updateActivity(updated: Activity) {
-    activities.value = activities.value.map(a => (a.id === updated.id ? updated : a))
+  async function addActivity(activity: { type: ActivityType; minutes: number; date: string; notes?: string }) {
+    if (!auth.token) throw new Error('Not authenticated')
+    const created = await createActivity(auth.token, activity)
+    activities.value.push(created)
   }
 
-  function deleteActivity(id: number) {
+  async function updateActivityRecord(updated: Activity) {
+    if (!auth.token) throw new Error('Not authenticated')
+    const saved = await updateActivity(auth.token, updated)
+    activities.value = activities.value.map(a => (a.id === saved.id ? saved : a))
+  }
+
+  async function deleteActivityRecord(id: number) {
+    if (!auth.token) throw new Error('Not authenticated')
+    await deleteActivity(auth.token, id)
     activities.value = activities.value.filter(a => a.id !== id)
   }
 
-  return { activities, myActivities, addActivity, updateActivity, deleteActivity }
+  return {
+    activities,
+    myActivities,
+    loadActivities,
+    addActivity,
+    updateActivity: updateActivityRecord,
+    deleteActivity: deleteActivityRecord,
+  }
 })

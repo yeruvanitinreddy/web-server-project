@@ -10,14 +10,14 @@ const username = ref('')
 const password = ref('')
 const error = ref<string | null>(null)
 
-function submit() {
+async function submit() {
   error.value = null
-  const ok = auth.login(username.value.trim(), password.value)
-  if (!ok) {
-    error.value = 'Invalid username or password'
-    return
+  try {
+    await auth.login(username.value.trim(), password.value)
+    router.push({ name: 'dashboard' })
+  } catch (err) {
+    error.value = err instanceof Error ? err.message : 'Invalid username or password'
   }
-  router.push({ name: 'dashboard' })
 }
 </script>
 

@@ -1,51 +1,57 @@
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { useUsersStore } from './users'
+import type { User } from '@/types'
+import { login as loginRequest } from '@/api/auth'
 
-const STORAGE_KEY = 'fitnessTracker.currentUserId'
+const TOKEN_KEY = 'fitnessTracker.token'
+const USER_KEY = 'fitnessTracker.currentUser'
 
 export const useAuthStore = defineStore('auth', () => {
-  // initialize from localStorage so refresh keeps you logged in
-  const currentUserId = ref<number | null>(
+  const token = ref<string | null>(localStorage.getItem(TOKEN_KEY))
+  const currentUser = ref<User | null>(
     (() => {
-      const raw = localStorage.getItem(STORAGE_KEY)
+      const raw = localStorage.getItem(USER_KEY)
       if (!raw) return null
-      const n = Number(raw)
-      return Number.isFinite(n) ? n : null
+      try {
+        return JSON.parse(raw) as User
+      } catch {
+        return null
+      }
     })()
   )
 
-  const usersStore = useUsersStore()
-
-  const currentUser = computed(() =>
-    usersStore.users.find(u => u.id === currentUserId.value) ?? null
-  )
-
-  const isAuthenticated = computed(() => currentUser.value !== null)
+  const isAuthenticated = computed(() => Boolean(token.value))
   const isAdmin = computed(() => currentUser.value?.role === 'admin')
 
-  function login(username: string, password: string) {
-    const user = usersStore.users.find(
-      u => u.username === username && u.password === password
-    )
-    if (!user) return false
-    currentUserId.value = user.id
+  async function login(username: string, password: string) {
+    const result = await loginRequest(username, password)
+    token.value = result.token
+    currentUser.value = result.user
     return true
   }
 
   function logout() {
-    currentUserId.value = null
+    token.value = null
+    currentUser.value = null
   }
 
-  // keep localStorage in sync
   watch(
-    currentUserId,
+    token,
     (val) => {
-      if (val === null) localStorage.removeItem(STORAGE_KEY)
-      else localStorage.setItem(STORAGE_KEY, String(val))
+      if (val) localStorage.setItem(TOKEN_KEY, val)
+      else localStorage.removeItem(TOKEN_KEY)
     },
     { immediate: true }
   )
 
-  return { currentUserId, currentUser, isAuthenticated, isAdmin, login, logout }
+  watch(
+    currentUser,
+    (val) => {
+      if (val) localStorage.setItem(USER_KEY, JSON.stringify(val))
+      else localStorage.removeItem(USER_KEY)
+    },
+    { immediate: true }
+  )
+
+  return { token, currentUser, isAuthenticated, isAdmin, login, logout }
 })

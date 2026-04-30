@@ -39,6 +39,12 @@ const router = createRouter({
       component: () => import('@/views/admin/AdminUsersView.vue'),
       meta: { requiresAuth: true, requiresRole: 'admin' },
     },
+    {
+      path: '/admin/exercise-types',
+      name: 'admin-exercise-types',
+      component: () => import('@/views/admin/ExerciseTypesView.vue'),
+      meta: { requiresAuth: true, requiresRole: 'admin' },
+    },
   ],
 })
 

@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: fitness-tracker-api
+    env: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: PORT
+        value: 3000
+  - type: static
+    name: fitness-tracker-client
+    rootDir: "fitness tracker"
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false

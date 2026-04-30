@@ -59,7 +59,7 @@ const hasFriends = computed(() => friendsStore.myFriends.length > 0)
               <tr v-for="item in friendsStore.friendsFeed" :key="`${item.friendId}-${item.activity.id}`">
                 <td>{{ item.activity.date }}</td>
                 <td>{{ item.friendName }}</td>
-                <td>{{ activityTypeLabels[item.activity.type] }}</td>
+                <td>{{ activityTypeLabels[item.activity.type] ?? item.activity.type }}</td>
                 <td>{{ item.activity.minutes }}</td>
                 <td>{{ item.activity.notes ?? '' }}</td>
               </tr>

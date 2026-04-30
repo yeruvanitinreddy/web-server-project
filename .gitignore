@@ -1,0 +1,5 @@
+.env
+server/.env
+server/node_modules
+fitness tracker/.env
+fitness tracker/tsconfig.app.tsbuildinfo

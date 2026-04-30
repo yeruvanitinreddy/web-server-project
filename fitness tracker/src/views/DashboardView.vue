@@ -15,6 +15,9 @@ const auth = useAuthStore()
         <RouterLink class="button is-link" to="/activities">My Activities</RouterLink>
         <RouterLink class="button is-info" to="/friends">Friends Feed</RouterLink>
         <RouterLink v-if="auth.isAdmin" class="button is-warning" to="/admin/users">Admin Users</RouterLink>
+        <RouterLink v-if="auth.isAdmin" class="button is-warning" to="/admin/exercise-types">
+          Admin Exercise Types
+        </RouterLink>
         <button class="button" @click="auth.logout()">Logout</button>
       </div>
     </div>
