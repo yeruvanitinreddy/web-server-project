@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import type { Activity, ActivityType } from '@/types'
-import { useActivitiesStore, activityTypeLabels } from '@/stores/activities'
-//import { parse } from 'path'
+import { useActivitiesStore } from '@/stores/activities'
+import { supabase } from '@/lib/supabase'
 
 const activitiesStore = useActivitiesStore()
 
@@ -13,11 +13,37 @@ const notes = ref<string>('')
 
 const error = ref<string | null>(null)
 
-const activityTypeOptions = computed(() =>
-  (Object.keys(activityTypeLabels) as ActivityType[]).map((k) => ({
-    value: k,
-    label: activityTypeLabels[k],
+const activityTypeOptions = ref<{ value: ActivityType; label: string }[]>([])
+
+function normalizeType(name: string): ActivityType {
+  const key = name.toLowerCase().replace(/\s+/g, '_')
+  return key as ActivityType
+}
+
+onMounted(async () => {
+  const { data, error } = await supabase.from('ExerciseTypes').select('name').order('name')
+
+  if (error) {
+    console.error(error)
+    return
+  }
+
+  activityTypeOptions.value = (data ?? []).map((row) => ({
+    value: normalizeType(row.name),
+    label: row.name,
   }))
+
+  if (!activityTypeOptions.value.find((o) => o.value === type.value)) {
+    type.value = activityTypeOptions.value[0]?.value ?? 'run'
+  }
+})
+
+const activityTypeLabelByValue = computed(
+  () =>
+    Object.fromEntries(activityTypeOptions.value.map((o) => [o.value, o.label])) as Record<
+      ActivityType,
+      string
+    >
 )
 
 const editingId = ref<number | null>(null)
@@ -178,7 +204,7 @@ function remove(id: number) {
                   <input v-model="editDraft!.date" class="input is-small" type="date" />
                 </td>
 
-                <td v-if="editingId !== a.id">{{ activityTypeLabels[a.type] }}</td>
+                <td v-if="editingId !== a.id">{{ activityTypeLabelByValue[a.type] ?? a.type }}</td>
                 <td v-else>
                   <div class="select is-small">
                     <select v-model="editDraft!.type">
