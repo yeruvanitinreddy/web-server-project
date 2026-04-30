@@ -21,8 +21,14 @@ async function createActivity(req, res) {
   }
 
   const userId = req.user.role === 'admin' && bodyUserId ? bodyUserId : req.user.id
-  const created = await Activities.create({ type, minutes: minutesValue, date, notes, userId })
-  return res.status(201).json(created)
+
+  try {
+    const created = await Activities.create({ type, minutes: minutesValue, date, notes, userId })
+    return res.status(201).json(created)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Failed to create activity.' })
+  }
 }
 
 async function updateActivity(req, res) {

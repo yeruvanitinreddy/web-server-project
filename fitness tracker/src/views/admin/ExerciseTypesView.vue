@@ -113,15 +113,23 @@ async function removeExerciseType(id: number) {
 
       <div class="box">
         <h2 class="title is-5">Add Exercise Type</h2>
-        <div class="field has-addons">
-          <div class="control is-expanded">
-            <input v-model="newName" class="input" placeholder="New exercise type" />
-          </div>
-          <div class="control">
-            <button class="button is-link" @click="addExerciseType">
-              <span class="icon"><i class="fa-solid fa-plus"></i></span>
-              <span>Add</span>
-            </button>
+        <div class="field">
+          <label class="label" for="new-exercise-type">Exercise Type</label>
+          <div class="control has-addons">
+            <div class="control is-expanded">
+              <input
+                id="new-exercise-type"
+                v-model="newName"
+                class="input"
+                placeholder="New exercise type"
+              />
+            </div>
+            <div class="control">
+              <button class="button is-link" @click="addExerciseType">
+                <span class="icon"><i class="fa-solid fa-plus"></i></span>
+                <span>Add</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

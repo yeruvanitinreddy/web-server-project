@@ -234,8 +234,15 @@ async function removeUser(id: number) {
                     </button>
                   </div>
                   <div v-if="editingId === user.id" class="field mt-2">
-                    <label class="label is-small">Reset Password (optional)</label>
-                    <input v-model="editDraft!.password" type="password" class="input is-small" />
+                    <label class="label is-small" :for="`edit-password-${user.id}`">
+                      Reset Password (optional)
+                    </label>
+                    <input
+                      :id="`edit-password-${user.id}`"
+                      v-model="editDraft!.password"
+                      type="password"
+                      class="input is-small"
+                    />
                   </div>
                 </td>
               </tr>

@@ -17,8 +17,18 @@ async function createUser(req, res) {
     return res.status(400).json({ error: 'Missing required user fields.' })
   }
 
-  const created = await Users.create({ firstName, lastName, username, password, role })
-  return res.status(201).json(created)
+  try {
+    const created = await Users.create({ firstName, lastName, username, password, role })
+    return res.status(201).json(created)
+  } catch (error) {
+    console.error(error)
+    const message =
+      typeof error?.message === 'string' && error.message.toLowerCase().includes('duplicate')
+        ? 'Username already exists.'
+        : 'Failed to create user.'
+    const status = message === 'Username already exists.' ? 409 : 500
+    return res.status(status).json({ error: message })
+  }
 }
 
 async function updateUser(req, res) {

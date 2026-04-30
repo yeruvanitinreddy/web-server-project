@@ -16,8 +16,18 @@ async function createExerciseType(req, res) {
     return res.status(400).json({ error: 'Exercise type name is required.' })
   }
 
-  const created = await ExerciseTypes.create({ name })
-  return res.status(201).json(created)
+  try {
+    const created = await ExerciseTypes.create({ name })
+    return res.status(201).json(created)
+  } catch (error) {
+    console.error(error)
+    const message =
+      typeof error?.message === 'string' && error.message.toLowerCase().includes('duplicate')
+        ? 'Exercise type already exists.'
+        : 'Failed to create exercise type.'
+    const status = message === 'Exercise type already exists.' ? 409 : 500
+    return res.status(status).json({ error: message })
+  }
 }
 
 async function updateExerciseType(req, res) {
