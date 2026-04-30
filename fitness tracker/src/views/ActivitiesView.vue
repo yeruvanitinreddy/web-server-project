@@ -28,10 +28,10 @@ onMounted(async () => {
     return
   }
 
-  activityTypeOptions.value = (data ?? []).map((row) => ({
-    value: normalizeType(row.name),
-    label: row.name,
-  }))
+  activityTypeOptions.value = (data ?? []).map((row: { name: string }) => ({
+  value: normalizeType(row.name),
+  label: row.name,
+}))
 
   if (!activityTypeOptions.value.find((o) => o.value === type.value)) {
     type.value = activityTypeOptions.value[0]?.value ?? 'run'
