@@ -1,6 +1,7 @@
 const cors = require('cors')
 const dotenv = require('dotenv')
 const express = require('express')
+const rateLimit = require('express-rate-limit')
 
 dotenv.config()
 
@@ -8,6 +9,15 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+})
+
+app.use(apiLimiter)
 
 const authRoutes = require('./routes/auth')
 const usersRoutes = require('./routes/users')
