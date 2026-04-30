@@ -6,18 +6,18 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const auth = useAuthStore()
 
-const username = ref('')
+const email = ref('')
 const password = ref('')
 const error = ref<string | null>(null)
 
-function submit() {
+async function submit() {
   error.value = null
-  const ok = auth.login(username.value.trim(), password.value)
-  if (!ok) {
-    error.value = 'Invalid username or password'
-    return
+  try {
+    await auth.login(email.value.trim(), password.value)
+    router.push({ name: 'dashboard' })
+  } catch (e: any) {
+    error.value = e.message ?? 'Login failed'
   }
-  router.push({ name: 'dashboard' })
 }
 </script>
 
@@ -31,9 +31,9 @@ function submit() {
         <div v-if="error" class="notification is-danger is-light">{{ error }}</div>
 
         <div class="field">
-          <label class="label">Username</label>
+          <label class="label">Email</label>
           <div class="control has-icons-left">
-            <input v-model="username" class="input" placeholder="admin / nitin / hemanth / pablo" />
+            <input v-model="email" class="input" placeholder="you@example.com" />
             <span class="icon is-left"><i class="fa-solid fa-user"></i></span>
           </div>
         </div>
@@ -41,7 +41,7 @@ function submit() {
         <div class="field">
           <label class="label">Password</label>
           <div class="control has-icons-left">
-            <input v-model="password" type="password" class="input" placeholder="admin / password" />
+            <input v-model="password" type="password" class="input" placeholder="••••••••" />
             <span class="icon is-left"><i class="fa-solid fa-lock"></i></span>
           </div>
         </div>
@@ -49,16 +49,6 @@ function submit() {
         <div class="field">
           <button class="button is-link is-fullwidth" @click="submit">Log in</button>
         </div>
-      </div>
-
-      <div class="content is-small">
-        <p><strong>Seed accounts:</strong></p>
-        <ul>
-          <li>admin / admin (admin)</li>
-          <li>nitin / password (user)</li>
-          <li>hemanth / password (user)</li>
-          <li>pablo / password (user)</li>
-        </ul>
       </div>
     </div>
   </section>

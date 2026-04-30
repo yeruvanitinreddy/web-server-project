@@ -1,51 +1,34 @@
 import { defineStore } from 'pinia'
-import { computed, ref, watch } from 'vue'
-import { useUsersStore } from './users'
-
-const STORAGE_KEY = 'fitnessTracker.currentUserId'
+import { computed, ref } from 'vue'
+import { supabase } from '@/lib/supabase'
 
 export const useAuthStore = defineStore('auth', () => {
-  // initialize from localStorage so refresh keeps you logged in
-  const currentUserId = ref<number | null>(
-    (() => {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (!raw) return null
-      const n = Number(raw)
-      return Number.isFinite(n) ? n : null
-    })()
-  )
+  const user = ref<{ id: string; email: string | null } | null>(null)
 
-  const usersStore = useUsersStore()
+  const isAuthenticated = computed(() => user.value !== null)
+  const isAdmin = computed(() => false) // adjust if you add roles later
 
-  const currentUser = computed(() =>
-    usersStore.users.find(u => u.id === currentUserId.value) ?? null
-  )
-
-  const isAuthenticated = computed(() => currentUser.value !== null)
-  const isAdmin = computed(() => currentUser.value?.role === 'admin')
-
-  function login(username: string, password: string) {
-    const user = usersStore.users.find(
-      u => u.username === username && u.password === password
-    )
-    if (!user) return false
-    currentUserId.value = user.id
-    return true
+  async function loadSession() {
+    const { data } = await supabase.auth.getUser()
+    user.value = data.user ? { id: data.user.id, email: data.user.email } : null
   }
 
-  function logout() {
-    currentUserId.value = null
+  async function login(email: string, password: string) {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+    await loadSession()
   }
 
-  // keep localStorage in sync
-  watch(
-    currentUserId,
-    (val) => {
-      if (val === null) localStorage.removeItem(STORAGE_KEY)
-      else localStorage.setItem(STORAGE_KEY, String(val))
-    },
-    { immediate: true }
-  )
+  async function signup(email: string, password: string) {
+    const { error } = await supabase.auth.signUp({ email, password })
+    if (error) throw error
+    await loadSession()
+  }
 
-  return { currentUserId, currentUser, isAuthenticated, isAdmin, login, logout }
+  async function logout() {
+    await supabase.auth.signOut()
+    user.value = null
+  }
+
+  return { user, isAuthenticated, isAdmin, loadSession, login, signup, logout }
 })
