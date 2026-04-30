@@ -1,21 +1,27 @@
 const Activities = require('../models/Activity')
 
 async function listActivities(req, res) {
-  const userIdParam = req.query.userId ? Number(req.query.userId) : null
-  const userId = Number.isFinite(userIdParam) ? userIdParam : undefined
-  const activities = await Activities.list({ userId })
-  return res.json(activities)
+  try {
+    const userIdParam = req.query.userId ? Number(req.query.userId) : null
+    const userId = Number.isFinite(userIdParam) ? userIdParam : undefined
+    const activities = await Activities.list({ userId })
+    return res.json(activities)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Failed to load activities.' })
+  }
 }
 
 async function createActivity(req, res) {
   const { type, minutes, date, notes, userId: bodyUserId } = req.body ?? {}
+  const minutesValue = Number(minutes)
 
-  if (!type || !date || !Number.isFinite(Number(minutes)) || Number(minutes) <= 0) {
+  if (!type || !date || !Number.isFinite(minutesValue) || minutesValue <= 0) {
     return res.status(400).json({ error: 'Missing required activity fields.' })
   }
 
   const userId = req.user.role === 'admin' && bodyUserId ? bodyUserId : req.user.id
-  const created = await Activities.create({ type, minutes: Number(minutes), date, notes, userId })
+  const created = await Activities.create({ type, minutes: minutesValue, date, notes, userId })
   return res.status(201).json(created)
 }
 

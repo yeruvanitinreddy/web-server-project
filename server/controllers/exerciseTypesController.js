@@ -1,8 +1,13 @@
 const ExerciseTypes = require('../models/ExerciseType')
 
 async function listExerciseTypes(_req, res) {
-  const exerciseTypes = await ExerciseTypes.list()
-  return res.json(exerciseTypes)
+  try {
+    const exerciseTypes = await ExerciseTypes.list()
+    return res.json(exerciseTypes)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Failed to load exercise types.' })
+  }
 }
 
 async function createExerciseType(req, res) {

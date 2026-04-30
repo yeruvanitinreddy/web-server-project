@@ -1,8 +1,13 @@
 const Users = require('../models/User')
 
 async function listUsers(_req, res) {
-  const users = await Users.list()
-  return res.json(users)
+  try {
+    const users = await Users.list()
+    return res.json(users)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Failed to load users.' })
+  }
 }
 
 async function createUser(req, res) {
