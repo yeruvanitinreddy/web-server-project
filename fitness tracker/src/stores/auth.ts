@@ -86,7 +86,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (error) throw error
 
     if (!data.user) {
-      throw new Error('Check your email to confirm your account before logging in.')
+      throw new Error('Signup initiated. Check your email to confirm your account.')
     }
 
     const { data: created, error: createError } = await supabase

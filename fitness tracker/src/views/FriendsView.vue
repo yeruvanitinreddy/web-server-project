@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useActivitiesStore } from '@/stores/activities'
 import { useAuthStore } from '@/stores/auth'
 import { useFriendsStore } from '@/stores/friends'
 import { useUsersStore } from '@/stores/users'
-import { activityTypeLabels } from '@/stores/activities'
 
 const auth = useAuthStore()
+const activitiesStore = useActivitiesStore()
 const friendsStore = useFriendsStore()
 const usersStore = useUsersStore()
 
@@ -24,6 +25,7 @@ const availableUsers = computed(() =>
 
 onMounted(async () => {
   try {
+    await activitiesStore.loadActivityTypes()
     await usersStore.loadUsers()
     await friendsStore.loadFriends()
     await friendsStore.loadFriendsFeed()
@@ -138,7 +140,7 @@ async function removeFriend(friendId: string) {
                 >
                   <td>{{ item.activity.date }}</td>
                   <td>{{ item.friendName }}</td>
-                  <td>{{ activityTypeLabels[item.activity.type] }}</td>
+                  <td>{{ activitiesStore.activityTypeLabels[item.activity.type] ?? item.activity.type }}</td>
                   <td>{{ item.activity.minutes }}</td>
                   <td>{{ item.activity.notes ?? '' }}</td>
                 </tr>

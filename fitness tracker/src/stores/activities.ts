@@ -4,14 +4,6 @@ import type { Activity, ActivityType } from '@/types'
 import { useAuthStore } from './auth'
 import { supabase } from '@/lib/supabase'
 
-export const activityTypeLabels: Record<ActivityType, string> = {
-  run: 'Run',
-  walk: 'Walk',
-  bike: 'Bike',
-  strength_training: 'Strength Training',
-  dance: 'Dance',
-}
-
 export const useActivitiesStore = defineStore('activities', () => {
   const activities = ref<Activity[]>([])
   const activityTypeOptions = ref<{ value: ActivityType; label: string }[]>([])
@@ -25,6 +17,13 @@ export const useActivitiesStore = defineStore('activities', () => {
       .slice()
       .sort((a, b) => b.date.localeCompare(a.date))
   })
+
+  const activityTypeLabels = computed(
+    () =>
+      Object.fromEntries(
+        activityTypeOptions.value.map((option) => [option.value, option.label])
+      ) as Record<ActivityType, string>
+  )
 
   function mapRow(row: any): Activity {
     return {
@@ -123,6 +122,7 @@ export const useActivitiesStore = defineStore('activities', () => {
   return {
     activities,
     activityTypeOptions,
+    activityTypeLabels,
     myActivities,
     loadActivityTypes,
     loadMyActivities,
