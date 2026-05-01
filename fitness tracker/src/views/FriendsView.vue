@@ -57,13 +57,6 @@ async function removeFriend(friendId: string) {
     error.value = e.message ?? 'Failed to remove friend.'
   }
 }
-
-function formatActivityType(type: string) {
-  return type
-    .split('_')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
-}
 </script>
 
 <template>
@@ -147,12 +140,7 @@ function formatActivityType(type: string) {
                 >
                   <td>{{ item.activity.date }}</td>
                   <td>{{ item.friendName }}</td>
-                  <td>
-                    {{
-                      activitiesStore.activityTypeLabels[item.activity.type] ??
-                      formatActivityType(item.activity.type)
-                    }}
-                  </td>
+                  <td>{{ activitiesStore.getActivityTypeLabel(item.activity.type) }}</td>
                   <td>{{ item.activity.minutes }}</td>
                   <td>{{ item.activity.notes ?? '' }}</td>
                 </tr>

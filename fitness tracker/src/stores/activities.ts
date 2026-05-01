@@ -25,6 +25,17 @@ export const useActivitiesStore = defineStore('activities', () => {
       ) as Record<ActivityType, string>
   )
 
+  function formatActivityType(type: string) {
+    return type
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  }
+
+  function getActivityTypeLabel(type: ActivityType) {
+    return activityTypeLabels.value[type] ?? formatActivityType(type)
+  }
+
   function mapRow(row: any): Activity {
     return {
       id: row.id,
@@ -51,15 +62,21 @@ export const useActivitiesStore = defineStore('activities', () => {
     }))
   }
 
+  async function requireUserId() {
+    const currentId = auth.user?.id
+    if (currentId) return currentId
+    const { data } = await supabase.auth.getUser()
+    if (!data.user) throw new Error('Not authenticated')
+    return data.user.id
+  }
+
   async function loadMyActivities() {
-    const { data: userData } = await supabase.auth.getUser()
-    const user = userData.user
-    if (!user) throw new Error('Not authenticated')
+    const userId = await requireUserId()
 
     const { data, error } = await supabase
       .from('Activity')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('date', { ascending: false })
 
     if (error) throw error
@@ -67,14 +84,12 @@ export const useActivitiesStore = defineStore('activities', () => {
   }
 
   async function addActivity(activity: { type: ActivityType; minutes: number; date: string; notes?: string }) {
-    const { data: userData } = await supabase.auth.getUser()
-    const user = userData.user
-    if (!user) throw new Error('Not authenticated')
+    const userId = await requireUserId()
 
     const { data, error } = await supabase
       .from('Activity')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         type: activity.type,
         duration: activity.minutes,
         date: activity.date,
@@ -88,9 +103,7 @@ export const useActivitiesStore = defineStore('activities', () => {
   }
 
   async function updateActivity(updated: Activity) {
-    const { data: userData } = await supabase.auth.getUser()
-    const user = userData.user
-    if (!user) throw new Error('Not authenticated')
+    const userId = await requireUserId()
 
     const { data, error } = await supabase
       .from('Activity')
@@ -101,7 +114,7 @@ export const useActivitiesStore = defineStore('activities', () => {
         notes: updated.notes,
       })
       .eq('id', updated.id)
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .select()
       .single()
 
@@ -110,11 +123,8 @@ export const useActivitiesStore = defineStore('activities', () => {
   }
 
   async function deleteActivity(id: number) {
-    const { data: userData } = await supabase.auth.getUser()
-    const user = userData.user
-    if (!user) throw new Error('Not authenticated')
-
-    const { error } = await supabase.from('Activity').delete().eq('id', id).eq('user_id', user.id)
+    const userId = await requireUserId()
+    const { error } = await supabase.from('Activity').delete().eq('id', id).eq('user_id', userId)
     if (error) throw error
     activities.value = activities.value.filter(a => a.id !== id)
   }
@@ -123,7 +133,9 @@ export const useActivitiesStore = defineStore('activities', () => {
     activities,
     activityTypeOptions,
     activityTypeLabels,
+    getActivityTypeLabel,
     myActivities,
+    requireUserId,
     loadActivityTypes,
     loadMyActivities,
     addActivity,
