@@ -4,6 +4,14 @@ import type { Activity, ActivityType } from '@/types'
 import { useAuthStore } from './auth'
 import { supabase } from '@/lib/supabase'
 
+export const activityTypeLabels: Record<ActivityType, string> = {
+  run: 'Run',
+  walk: 'Walk',
+  bike: 'Bike',
+  strength_training: 'Strength Training',
+  dance: 'Dance',
+}
+
 export const useActivitiesStore = defineStore('activities', () => {
   const activities = ref<Activity[]>([])
   const auth = useAuthStore()
@@ -65,6 +73,10 @@ export const useActivitiesStore = defineStore('activities', () => {
   }
 
   async function updateActivity(updated: Activity) {
+    const { data: userData } = await supabase.auth.getUser()
+    const user = userData.user
+    if (!user) throw new Error('Not authenticated')
+
     const { data, error } = await supabase
       .from('Activity')
       .update({
@@ -74,6 +86,7 @@ export const useActivitiesStore = defineStore('activities', () => {
         notes: updated.notes,
       })
       .eq('id', updated.id)
+      .eq('user_id', user.id)
       .select()
       .single()
 
@@ -82,7 +95,11 @@ export const useActivitiesStore = defineStore('activities', () => {
   }
 
   async function deleteActivity(id: number) {
-    const { error } = await supabase.from('Activity').delete().eq('id', id)
+    const { data: userData } = await supabase.auth.getUser()
+    const user = userData.user
+    if (!user) throw new Error('Not authenticated')
+
+    const { error } = await supabase.from('Activity').delete().eq('id', id).eq('user_id', user.id)
     if (error) throw error
     activities.value = activities.value.filter(a => a.id !== id)
   }

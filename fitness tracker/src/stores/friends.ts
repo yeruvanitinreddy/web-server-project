@@ -7,13 +7,13 @@ import { useActivitiesStore } from './activities'
 import type { Activity } from '@/types'
 
 export type FriendActivityItem = {
-  friendId: number
+  friendId: string
   friendName: string
   activity: Activity
 }
 
 export const useFriendsStore = defineStore('friends', () => {
-  const friendsByUserId = ref<Record<number, number[]>>(
+  const friendsByUserId = ref<Record<string, string[]>>(
     JSON.parse(JSON.stringify(seedFriendsByUserId))
   )
 
