@@ -86,7 +86,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (error) throw error
 
     if (!data.user) {
-      throw new Error('Signup initiated. Check your email to confirm your account.')
+      return { needsConfirmation: true }
     }
 
     const { data: created, error: createError } = await supabase
@@ -105,6 +105,7 @@ export const useAuthStore = defineStore('auth', () => {
     profile.value = mapProfile(created)
     user.value = { id: data.user.id, email }
     initialized.value = true
+    return { needsConfirmation: false }
   }
 
   async function logout() {

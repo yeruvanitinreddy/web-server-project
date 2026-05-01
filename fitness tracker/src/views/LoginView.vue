@@ -23,12 +23,17 @@ async function submit() {
         error.value = 'Please enter your first and last name.'
         return
       }
-      await auth.signup(
+      const result = await auth.signup(
         email.value.trim(),
         password.value,
         firstName.value.trim(),
         lastName.value.trim()
       )
+      if (result.needsConfirmation) {
+        notice.value = 'Signup initiated. Check your email to confirm your account before logging in.'
+        isSignup.value = false
+        return
+      }
       router.push({ name: 'dashboard' })
     } else {
       await auth.login(email.value.trim(), password.value)
