@@ -28,3 +28,14 @@ Vue 3 + Supabase fitness tracking app with activities, friends, and admin-manage
 ## Admin access
 
 Set a user's `role` to `admin` in the `profiles` table to grant access to the Admin Users page.
+
+## Render deployment
+
+This repo includes `render.yaml` for a static site deployment. In Render:
+
+1. Create a new **Static Site** using the repo.
+2. Ensure the root directory is `fitness tracker`.
+3. Add the environment variables:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+4. Deploy. The `_redirects` file in `public/` enables SPA routing.
