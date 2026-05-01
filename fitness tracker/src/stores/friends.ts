@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { Activity, ActivityType, UserProfile } from '@/types'
+import { mapProfile, type ProfileRow } from '@/lib/profiles'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from './auth'
 
@@ -71,22 +72,6 @@ export const useFriendsStore = defineStore('friends', () => {
     return data.user.id
   }
 
-  function mapProfile(row: {
-    id: string
-    email: string | null
-    first_name: string
-    last_name: string
-    role: string
-  }): UserProfile {
-    return {
-      id: row.id,
-      email: row.email,
-      firstName: row.first_name,
-      lastName: row.last_name,
-      role: row.role as UserProfile['role'],
-    }
-  }
-
   async function loadFriends() {
     const userId = await requireUserId()
     const { data, error } = await supabase
@@ -110,7 +95,7 @@ export const useFriendsStore = defineStore('friends', () => {
       .order('first_name', { ascending: true })
 
     if (profileError) throw profileError
-    friends.value = (profiles ?? []).map(mapProfile)
+    friends.value = (profiles ?? []).map((row) => mapProfile(row as ProfileRow))
   }
 
   async function loadFriendsFeed() {

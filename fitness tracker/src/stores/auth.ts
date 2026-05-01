@@ -1,25 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import type { Role, UserProfile } from '@/types'
+import type { UserProfile } from '@/types'
+import { mapProfile, type ProfileRow } from '@/lib/profiles'
 import { supabase } from '@/lib/supabase'
-
-type ProfileRow = {
-  id: string
-  email: string | null
-  first_name: string
-  last_name: string
-  role: Role
-}
-
-function mapProfile(row: ProfileRow): UserProfile {
-  return {
-    id: row.id,
-    email: row.email,
-    firstName: row.first_name,
-    lastName: row.last_name,
-    role: row.role,
-  }
-}
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<{ id: string; email: string | null } | null>(null)
@@ -39,7 +22,7 @@ export const useAuthStore = defineStore('auth', () => {
 
     if (error) throw error
     if (data) {
-      profile.value = mapProfile(data)
+      profile.value = mapProfile(data as ProfileRow)
       return
     }
 
@@ -56,7 +39,7 @@ export const useAuthStore = defineStore('auth', () => {
       .single()
 
     if (createError) throw createError
-    profile.value = mapProfile(created)
+    profile.value = mapProfile(created as ProfileRow)
   }
 
   async function loadSession() {
@@ -102,7 +85,7 @@ export const useAuthStore = defineStore('auth', () => {
       .single()
 
     if (createError) throw createError
-    profile.value = mapProfile(created)
+    profile.value = mapProfile(created as ProfileRow)
     user.value = { id: data.user.id, email }
     initialized.value = true
     return { needsConfirmation: false }
