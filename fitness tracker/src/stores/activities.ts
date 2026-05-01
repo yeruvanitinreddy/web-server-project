@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 
 export const useActivitiesStore = defineStore('activities', () => {
   const activities = ref<Activity[]>([])
+  const activityTypeOptions = ref<{ value: ActivityType; label: string }[]>([])
   const auth = useAuthStore()
 
   const myActivities = computed(() => {
@@ -16,6 +17,24 @@ export const useActivitiesStore = defineStore('activities', () => {
       .slice()
       .sort((a, b) => b.date.localeCompare(a.date))
   })
+
+  const activityTypeLabels = computed(
+    () =>
+      Object.fromEntries(
+        activityTypeOptions.value.map((option) => [option.value, option.label])
+      ) as Record<ActivityType, string>
+  )
+
+  function formatActivityType(type: string) {
+    return type
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  }
+
+  function getActivityTypeLabel(type: ActivityType) {
+    return activityTypeLabels.value[type] ?? formatActivityType(type)
+  }
 
   function mapRow(row: any): Activity {
     return {
@@ -28,15 +47,36 @@ export const useActivitiesStore = defineStore('activities', () => {
     }
   }
 
+  function normalizeType(name: string): ActivityType {
+    const key = name.toLowerCase().replace(/\s+/g, '_')
+    return key as ActivityType
+  }
+
+  async function loadActivityTypes() {
+    const { data, error } = await supabase.from('ExerciseTypes').select('name').order('name')
+    if (error) throw error
+
+    activityTypeOptions.value = (data ?? []).map((row: { name: string }) => ({
+      value: normalizeType(row.name),
+      label: row.name,
+    }))
+  }
+
+  async function requireUserId() {
+    const currentId = auth.user?.id
+    if (currentId) return currentId
+    const { data } = await supabase.auth.getUser()
+    if (!data.user) throw new Error('Not authenticated')
+    return data.user.id
+  }
+
   async function loadMyActivities() {
-    const { data: userData } = await supabase.auth.getUser()
-    const user = userData.user
-    if (!user) throw new Error('Not authenticated')
+    const userId = await requireUserId()
 
     const { data, error } = await supabase
       .from('Activity')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('date', { ascending: false })
 
     if (error) throw error
@@ -44,14 +84,12 @@ export const useActivitiesStore = defineStore('activities', () => {
   }
 
   async function addActivity(activity: { type: ActivityType; minutes: number; date: string; notes?: string }) {
-    const { data: userData } = await supabase.auth.getUser()
-    const user = userData.user
-    if (!user) throw new Error('Not authenticated')
+    const userId = await requireUserId()
 
     const { data, error } = await supabase
       .from('Activity')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         type: activity.type,
         duration: activity.minutes,
         date: activity.date,
@@ -65,6 +103,8 @@ export const useActivitiesStore = defineStore('activities', () => {
   }
 
   async function updateActivity(updated: Activity) {
+    const userId = await requireUserId()
+
     const { data, error } = await supabase
       .from('Activity')
       .update({
@@ -74,6 +114,7 @@ export const useActivitiesStore = defineStore('activities', () => {
         notes: updated.notes,
       })
       .eq('id', updated.id)
+      .eq('user_id', userId)
       .select()
       .single()
 
@@ -82,10 +123,23 @@ export const useActivitiesStore = defineStore('activities', () => {
   }
 
   async function deleteActivity(id: number) {
-    const { error } = await supabase.from('Activity').delete().eq('id', id)
+    const userId = await requireUserId()
+    const { error } = await supabase.from('Activity').delete().eq('id', id).eq('user_id', userId)
     if (error) throw error
     activities.value = activities.value.filter(a => a.id !== id)
   }
 
-  return { activities, myActivities, loadMyActivities, addActivity, updateActivity, deleteActivity }
+  return {
+    activities,
+    activityTypeOptions,
+    activityTypeLabels,
+    getActivityTypeLabel,
+    myActivities,
+    requireUserId,
+    loadActivityTypes,
+    loadMyActivities,
+    addActivity,
+    updateActivity,
+    deleteActivity,
+  }
 })

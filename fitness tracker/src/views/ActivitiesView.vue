@@ -2,7 +2,6 @@
 import { computed, ref, onMounted } from 'vue'
 import type { Activity, ActivityType } from '@/types'
 import { useActivitiesStore } from '@/stores/activities'
-import { supabase } from '@/lib/supabase'
 
 const activitiesStore = useActivitiesStore()
 
@@ -13,35 +12,23 @@ const notes = ref<string>('')
 
 const error = ref<string | null>(null)
 
-const activityTypeOptions = ref<{ value: ActivityType; label: string }[]>([])
-
-function normalizeType(name: string): ActivityType {
-  const key = name.toLowerCase().replace(/\s+/g, '_')
-  return key as ActivityType
-}
-
 onMounted(async () => {
-  const { data, error } = await supabase.from('ExerciseTypes').select('name').order('name')
-  if (error) {
-    console.error(error)
-    return
+  try {
+    await activitiesStore.loadActivityTypes()
+    if (!activitiesStore.activityTypeOptions.find((o) => o.value === type.value)) {
+      type.value = activitiesStore.activityTypeOptions[0]?.value ?? 'run'
+    }
+    await activitiesStore.loadMyActivities()
+  } catch (e: any) {
+    error.value = e.message ?? 'Failed to load activities.'
   }
-
-  activityTypeOptions.value = (data ?? []).map((row: { name: string }) => ({
-    value: normalizeType(row.name),
-    label: row.name,
-  }))
-
-  if (!activityTypeOptions.value.find((o) => o.value === type.value)) {
-    type.value = activityTypeOptions.value[0]?.value ?? 'run'
-  }
-
-  await activitiesStore.loadMyActivities()
 })
 
 const activityTypeLabelByValue = computed(
   () =>
-    Object.fromEntries(activityTypeOptions.value.map((o) => [o.value, o.label])) as Record<
+    Object.fromEntries(
+      activitiesStore.activityTypeOptions.map((o) => [o.value, o.label])
+    ) as Record<
       ActivityType,
       string
     >
@@ -141,7 +128,11 @@ async function remove(id: number) {
             <div class="control">
               <div class="select is-fullwidth">
                 <select v-model="type">
-                  <option v-for="opt in activityTypeOptions" :key="opt.value" :value="opt.value">
+                  <option
+                    v-for="opt in activitiesStore.activityTypeOptions"
+                    :key="opt.value"
+                    :value="opt.value"
+                  >
                     {{ opt.label }}
                   </option>
                 </select>
@@ -209,7 +200,11 @@ async function remove(id: number) {
                 <td v-else>
                   <div class="select is-small">
                     <select v-model="editDraft!.type">
-                      <option v-for="opt in activityTypeOptions" :key="opt.value" :value="opt.value">
+                      <option
+                        v-for="opt in activitiesStore.activityTypeOptions"
+                        :key="opt.value"
+                        :value="opt.value"
+                      >
                         {{ opt.label }}
                       </option>
                     </select>
