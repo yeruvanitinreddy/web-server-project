@@ -1,25 +1,59 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { UserProfile } from '@/types'
-import { seedUsers } from '@/data/seed'
+import type { Role, UserProfile } from '@/types'
+import { supabase } from '@/lib/supabase'
 
 export const useUsersStore = defineStore('users', () => {
-  const users = ref<UserProfile[]>(structuredClone(seedUsers))
+  const users = ref<UserProfile[]>([])
 
-  function addUser(user: Omit<UserProfile, 'id'> & { id?: string }) {
-    const nextId = String(
-      Math.max(...users.value.map(u => Number.parseInt(u.id, 10)), 0) + 1
-    )
-    users.value.push({ ...user, id: user.id ?? nextId })
+  function mapProfile(row: {
+    id: string
+    email: string | null
+    first_name: string
+    last_name: string
+    role: Role
+  }): UserProfile {
+    return {
+      id: row.id,
+      email: row.email,
+      firstName: row.first_name,
+      lastName: row.last_name,
+      role: row.role,
+    }
   }
 
-  function updateUser(updated: UserProfile) {
-    users.value = users.value.map(u => (u.id === updated.id ? updated : u))
+  async function loadUsers() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, email, first_name, last_name, role')
+      .order('last_name', { ascending: true })
+      .order('first_name', { ascending: true })
+
+    if (error) throw error
+    users.value = (data ?? []).map(mapProfile)
   }
 
-  function deleteUser(userId: string) {
+  async function updateUser(updated: UserProfile) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({
+        first_name: updated.firstName,
+        last_name: updated.lastName,
+        role: updated.role,
+      })
+      .eq('id', updated.id)
+      .select('id, email, first_name, last_name, role')
+      .single()
+
+    if (error) throw error
+    users.value = users.value.map(u => (u.id === updated.id ? mapProfile(data) : u))
+  }
+
+  async function deleteUser(userId: string) {
+    const { error } = await supabase.from('profiles').delete().eq('id', userId)
+    if (error) throw error
     users.value = users.value.filter(u => u.id !== userId)
   }
 
-  return { users, addUser, updateUser, deleteUser }
+  return { users, loadUsers, updateUser, deleteUser }
 })

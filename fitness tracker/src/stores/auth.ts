@@ -104,6 +104,7 @@ export const useAuthStore = defineStore('auth', () => {
     if (createError) throw createError
     profile.value = mapProfile(created)
     user.value = { id: data.user.id, email }
+    initialized.value = true
   }
 
   async function logout() {
