@@ -14,6 +14,7 @@ export const activityTypeLabels: Record<ActivityType, string> = {
 
 export const useActivitiesStore = defineStore('activities', () => {
   const activities = ref<Activity[]>([])
+  const activityTypeOptions = ref<{ value: ActivityType; label: string }[]>([])
   const auth = useAuthStore()
 
   const myActivities = computed(() => {
@@ -34,6 +35,21 @@ export const useActivitiesStore = defineStore('activities', () => {
       date: row.date,
       notes: row.notes ?? undefined,
     }
+  }
+
+  function normalizeType(name: string): ActivityType {
+    const key = name.toLowerCase().replace(/\s+/g, '_')
+    return key as ActivityType
+  }
+
+  async function loadActivityTypes() {
+    const { data, error } = await supabase.from('ExerciseTypes').select('name').order('name')
+    if (error) throw error
+
+    activityTypeOptions.value = (data ?? []).map((row: { name: string }) => ({
+      value: normalizeType(row.name),
+      label: row.name,
+    }))
   }
 
   async function loadMyActivities() {
@@ -104,5 +120,14 @@ export const useActivitiesStore = defineStore('activities', () => {
     activities.value = activities.value.filter(a => a.id !== id)
   }
 
-  return { activities, myActivities, loadMyActivities, addActivity, updateActivity, deleteActivity }
+  return {
+    activities,
+    activityTypeOptions,
+    myActivities,
+    loadActivityTypes,
+    loadMyActivities,
+    addActivity,
+    updateActivity,
+    deleteActivity,
+  }
 })
