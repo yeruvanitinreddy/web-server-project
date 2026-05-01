@@ -51,7 +51,9 @@ async function saveEdit() {
 }
 
 async function removeUser(user: UserProfile) {
-  const ok = confirm(`Delete ${user.firstName} ${user.lastName}? This removes the profile only.`)
+  const ok = confirm(
+    `Delete ${user.firstName} ${user.lastName}? This removes the profile only; auth account and existing activity/friend data remain.`
+  )
   if (!ok) return
   error.value = null
 

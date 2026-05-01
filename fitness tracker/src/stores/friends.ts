@@ -3,7 +3,6 @@ import { computed, ref } from 'vue'
 import type { Activity, ActivityType, UserProfile } from '@/types'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from './auth'
-import { useUsersStore } from './users'
 
 export type FriendActivityItem = {
   friendId: string
@@ -17,8 +16,6 @@ export const useFriendsStore = defineStore('friends', () => {
   const friendActivities = ref<Activity[]>([])
 
   const auth = useAuthStore()
-  const usersStore = useUsersStore()
-
   const myFriendIds = computed(() => {
     return friendIds.value
   })
@@ -74,6 +71,22 @@ export const useFriendsStore = defineStore('friends', () => {
     return data.user.id
   }
 
+  function mapProfile(row: {
+    id: string
+    email: string | null
+    first_name: string
+    last_name: string
+    role: string
+  }): UserProfile {
+    return {
+      id: row.id,
+      email: row.email,
+      firstName: row.first_name,
+      lastName: row.last_name,
+      role: row.role as UserProfile['role'],
+    }
+  }
+
   async function loadFriends() {
     const userId = await requireUserId()
     const { data, error } = await supabase
@@ -84,8 +97,20 @@ export const useFriendsStore = defineStore('friends', () => {
     if (error) throw error
     friendIds.value = (data ?? []).map(row => row.friend_id)
 
-    await usersStore.loadUsers()
-    friends.value = usersStore.users.filter(user => friendIds.value.includes(user.id))
+    if (friendIds.value.length === 0) {
+      friends.value = []
+      return
+    }
+
+    const { data: profiles, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, email, first_name, last_name, role')
+      .in('id', friendIds.value)
+      .order('last_name', { ascending: true })
+      .order('first_name', { ascending: true })
+
+    if (profileError) throw profileError
+    friends.value = (profiles ?? []).map(mapProfile)
   }
 
   async function loadFriendsFeed() {

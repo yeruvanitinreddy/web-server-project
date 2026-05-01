@@ -48,8 +48,8 @@ export const useAuthStore = defineStore('auth', () => {
       .insert({
         id: userId,
         email,
-        first_name: 'New',
-        last_name: 'User',
+        first_name: '',
+        last_name: '',
         role: 'user',
       })
       .select('id, email, first_name, last_name, role')
