@@ -1,11 +1,10 @@
 export type Role = 'admin' | 'user'
 
-export type User = {
-  id: number
+export type UserProfile = {
+  id: string
+  email: string | null
   firstName: string
   lastName: string
-  username: string
-  password: string
   role: Role
 }
 
@@ -13,7 +12,7 @@ export type ActivityType = 'run' | 'walk' | 'bike' | 'strength_training' | 'danc
 
 export type Activity = {
   id: number
-  userId: number
+  userId: string
   type: ActivityType
   minutes: number
   date: string // YYYY-MM-DD

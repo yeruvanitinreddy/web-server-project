@@ -1,23 +1,44 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { User } from '@/types'
-import { seedUsers } from '@/data/seed'
+import type { UserProfile } from '@/types'
+import { mapProfile, type ProfileRow } from '@/lib/profiles'
+import { supabase } from '@/lib/supabase'
 
 export const useUsersStore = defineStore('users', () => {
-  const users = ref<User[]>(structuredClone(seedUsers))
+  const users = ref<UserProfile[]>([])
 
-  function addUser(user: Omit<User, 'id'>) {
-    const nextId = Math.max(...users.value.map(u => u.id), 0) + 1
-    users.value.push({ ...user, id: nextId })
+  async function loadUsers() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, email, first_name, last_name, role')
+      .order('last_name', { ascending: true })
+      .order('first_name', { ascending: true })
+
+    if (error) throw error
+    users.value = (data ?? []).map((row) => mapProfile(row as ProfileRow))
   }
 
-  function updateUser(updated: User) {
-    users.value = users.value.map(u => (u.id === updated.id ? updated : u))
+  async function updateUser(updated: UserProfile) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({
+        first_name: updated.firstName,
+        last_name: updated.lastName,
+        role: updated.role,
+      })
+      .eq('id', updated.id)
+      .select('id, email, first_name, last_name, role')
+      .single()
+
+    if (error) throw error
+    users.value = users.value.map(u => (u.id === updated.id ? mapProfile(data as ProfileRow) : u))
   }
 
-  function deleteUser(userId: number) {
+  async function deleteUser(userId: string) {
+    const { error } = await supabase.from('profiles').delete().eq('id', userId)
+    if (error) throw error
     users.value = users.value.filter(u => u.id !== userId)
   }
 
-  return { users, addUser, updateUser, deleteUser }
+  return { users, loadUsers, updateUser, deleteUser }
 })
