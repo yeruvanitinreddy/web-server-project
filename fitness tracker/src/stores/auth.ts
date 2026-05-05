@@ -54,9 +54,16 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function initialize() {
-    if (initialized.value) return
+  if (initialized.value) return
+  try {
     await loadSession()
+  } catch (error) {
+    console.error('Auth initialization failed:', error)
+    user.value = null
+    profile.value = null
+    initialized.value = true
   }
+}
 
   async function login(email: string, password: string) {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
