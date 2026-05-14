@@ -101,7 +101,16 @@ watch(
 
       <div v-if="error" class="notification is-danger is-light">{{ error }}</div>
 
-      <div v-if="loading" class="notification is-info is-light">Loading friends...</div>
+      <div v-if="loading" class="box">
+        <div class="feed-skeleton">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>
 
       <div v-else>
         <div class="box">
@@ -157,10 +166,7 @@ watch(
             </div>
 
             <div ref="feedContainer" class="feed-scroll">
-              <div
-                  v-if="friendsStore.friendsFeed.length === 0 && friendsStore.isLoadingFeed"
-                  class="feed-skeleton"
-              >
+              <div v-if="friendsStore.isLoadingFeed" class="feed-skeleton">
                 <div class="skeleton-title"></div>
                 <div class="skeleton-line"></div>
                 <div class="skeleton-line"></div>
