@@ -11,19 +11,22 @@ export type FriendActivityItem = {
   activity: Activity
 }
 
+const PAGE_SIZE = 10
+
 export const useFriendsStore = defineStore('friends', () => {
   const friendIds = ref<string[]>([])
   const friends = ref<UserProfile[]>([])
   const friendActivities = ref<Activity[]>([])
 
   const auth = useAuthStore()
-  const myFriendIds = computed(() => {
-    return friendIds.value
-  })
 
-  const myFriends = computed(() => {
-    return friends.value
-  })
+  const isLoadingFeed = ref(false)
+  const hasMoreFeed = ref(true)
+  const totalFeedCount = ref<number | null>(null)
+  const feedPage = ref(0)
+
+  const myFriendIds = computed(() => friendIds.value)
+  const myFriends = computed(() => friends.value)
 
   const friendsFeed = computed<FriendActivityItem[]>(() => {
     const friendById = new Map(friends.value.map(friend => [friend.id, friend]))
@@ -98,28 +101,70 @@ export const useFriendsStore = defineStore('friends', () => {
     friends.value = (profiles ?? []).map((row) => mapProfile(row as ProfileRow))
   }
 
-  async function loadFriendsFeed() {
+  async function loadFriendsFeed(reset = false) {
+    if (reset) {
+      friendActivities.value = []
+      feedPage.value = 0
+      hasMoreFeed.value = true
+      totalFeedCount.value = null
+    }
+
+    if (isLoadingFeed.value || !hasMoreFeed.value) return
     if (friendIds.value.length === 0) {
       friendActivities.value = []
+      hasMoreFeed.value = false
+      totalFeedCount.value = 0
       return
     }
 
-    const { data, error } = await supabase
-      .from('Activity')
-      .select('*')
-      .in('user_id', friendIds.value)
-      .order('date', { ascending: false })
+    isLoadingFeed.value = true
+    try {
+      const start = feedPage.value * PAGE_SIZE
+      const end = start + PAGE_SIZE - 1
 
-    if (error) throw error
-    friendActivities.value = (data ?? []).map(mapActivity)
+      const { data, error, count } = await supabase
+        .from('Activity')
+        .select('*', { count: 'exact' })
+        .in('user_id', friendIds.value)
+        .order('date', { ascending: false })
+        .order('id', { ascending: false })
+        .range(start, end)
+
+      if (error) throw error
+
+      const rows = (data ?? []).map(mapActivity)
+
+      if (reset) {
+        friendActivities.value = rows
+      } else {
+        friendActivities.value.push(...rows)
+      }
+
+      if (typeof count === 'number') {
+        totalFeedCount.value = count
+      }
+
+      feedPage.value += 1
+      hasMoreFeed.value = rows.length === PAGE_SIZE
+    } finally {
+      isLoadingFeed.value = false
+    }
+  }
+
+  async function loadMoreFriendsFeed() {
+    await loadFriendsFeed(false)
   }
 
   async function addFriend(friendId: string) {
     const userId = await requireUserId()
-    const { error } = await supabase.from('Friends').insert({ user_id: userId, friend_id: friendId })
+    const { error } = await supabase.from('Friends').insert({
+      user_id: userId,
+      friend_id: friendId,
+    })
+
     if (error) throw error
     await loadFriends()
-    await loadFriendsFeed()
+    await loadFriendsFeed(true)
   }
 
   async function removeFriend(friendId: string) {
@@ -131,10 +176,24 @@ export const useFriendsStore = defineStore('friends', () => {
       .eq('friend_id', friendId)
 
     if (error) throw error
-    friendIds.value = friendIds.value.filter(id => id !== friendId)
-    friends.value = friends.value.filter(friend => friend.id !== friendId)
-    friendActivities.value = friendActivities.value.filter(a => a.userId !== friendId)
+    await loadFriends()
+    await loadFriendsFeed(true)
   }
 
-  return { myFriendIds, myFriends, friendsFeed, loadFriends, loadFriendsFeed, addFriend, removeFriend }
+  return {
+    friendIds,
+    friends,
+    friendActivities,
+    myFriendIds,
+    myFriends,
+    friendsFeed,
+    isLoadingFeed,
+    hasMoreFeed,
+    totalFeedCount,
+    loadFriends,
+    loadFriendsFeed,
+    loadMoreFriendsFeed,
+    addFriend,
+    removeFriend,
+  }
 })

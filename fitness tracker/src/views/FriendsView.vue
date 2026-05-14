@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useInfiniteScroll } from '@vueuse/core'
 import { RouterLink } from 'vue-router'
 import { useActivitiesStore } from '@/stores/activities'
 import { useAuthStore } from '@/stores/auth'
@@ -14,6 +15,7 @@ const usersStore = useUsersStore()
 const error = ref<string | null>(null)
 const loading = ref(true)
 const selectedFriendId = ref('')
+const feedContainer = ref<HTMLElement | null>(null)
 
 const hasFriends = computed(() => friendsStore.myFriends.length > 0)
 
@@ -28,7 +30,7 @@ onMounted(async () => {
     await activitiesStore.loadActivityTypes()
     await usersStore.loadUsers()
     await friendsStore.loadFriends()
-    await friendsStore.loadFriendsFeed()
+    await friendsStore.loadFriendsFeed(true)
   } catch (e: any) {
     error.value = e.message ?? 'Failed to load friends.'
   } finally {
@@ -57,6 +59,28 @@ async function removeFriend(friendId: string) {
     error.value = e.message ?? 'Failed to remove friend.'
   }
 }
+
+useInfiniteScroll(
+  feedContainer,
+  async () => {
+    if (friendsStore.hasMoreFeed && !friendsStore.isLoadingFeed) {
+      await friendsStore.loadMoreFriendsFeed()
+    }
+  },
+  {
+    distance: 120,
+    canLoadMore: () => friendsStore.hasMoreFeed,
+  }
+)
+
+watch(
+  () => friendsStore.myFriendIds.length,
+  async () => {
+    if (!loading.value) {
+      await friendsStore.loadFriendsFeed(true)
+    }
+  }
+)
 </script>
 
 <template>
@@ -117,38 +141,105 @@ async function removeFriend(friendId: string) {
             </div>
           </div>
 
-          <div v-if="friendsStore.friendsFeed.length === 0" class="notification is-warning is-light">
-            Your friends have no activities yet.
-          </div>
+          <div class="box">
+            <div class="level mb-3">
+              <div class="level-left">
+                <h2 class="title is-6 mb-0">Friend Activities</h2>
+              </div>
+              <div class="level-right">
+                <p class="has-text-grey">
+                  Showing {{ friendsStore.friendsFeed.length }}
+                  <span v-if="friendsStore.totalFeedCount !== null">
+                    of {{ friendsStore.totalFeedCount }}
+                  </span>
+                </p>
+              </div>
+            </div>
 
-          <div v-else class="table-container">
-            <table class="table is-fullwidth is-striped is-hoverable">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Friend</th>
-                  <th>Type</th>
-                  <th>Minutes</th>
-                  <th>Notes</th>
-                </tr>
-              </thead>
+            <div ref="feedContainer" class="feed-scroll">
+              <div
+                v-if="friendsStore.friendsFeed.length === 0 && friendsStore.isLoadingFeed"
+                class="feed-skeleton"
+              >
+                <div class="skeleton-row" v-for="n in 5" :key="n"></div>
+              </div>
 
-              <tbody>
-                <tr
-                  v-for="item in friendsStore.friendsFeed"
-                  :key="`${item.friendId}-${item.activity.id}`"
-                >
-                  <td>{{ item.activity.date }}</td>
-                  <td>{{ item.friendName }}</td>
-                  <td>{{ activitiesStore.getActivityTypeLabel(item.activity.type) }}</td>
-                  <td>{{ item.activity.minutes }}</td>
-                  <td>{{ item.activity.notes ?? '' }}</td>
-                </tr>
-              </tbody>
-            </table>
+              <div
+                v-else-if="friendsStore.friendsFeed.length === 0"
+                class="notification is-warning is-light"
+              >
+                Your friends have no activities yet.
+              </div>
+
+              <table v-else class="table is-fullwidth is-striped is-hoverable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Friend</th>
+                    <th>Type</th>
+                    <th>Minutes</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr
+                    v-for="item in friendsStore.friendsFeed"
+                    :key="`${item.friendId}-${item.activity.id}`"
+                  >
+                    <td>{{ item.activity.date }}</td>
+                    <td>{{ item.friendName }}</td>
+                    <td>{{ activitiesStore.getActivityTypeLabel(item.activity.type) }}</td>
+                    <td>{{ item.activity.minutes }}</td>
+                    <td>{{ item.activity.notes ?? '' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div v-if="friendsStore.isLoadingFeed" class="has-text-centered py-4">
+                Loading more activities...
+              </div>
+
+              <div
+                v-else-if="!friendsStore.hasMoreFeed && friendsStore.friendsFeed.length > 0"
+                class="has-text-centered has-text-grey py-4"
+              >
+                You’ve reached the end.
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 </template>
+
+<style scoped>
+.feed-scroll {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.feed-skeleton {
+  display: grid;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.skeleton-row {
+  height: 22px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 37%, #2a2a2a 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.2s ease infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: 0 0;
+  }
+}
+</style>
