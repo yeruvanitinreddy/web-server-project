@@ -158,10 +158,15 @@ watch(
 
             <div ref="feedContainer" class="feed-scroll">
               <div
-                v-if="friendsStore.friendsFeed.length === 0 && friendsStore.isLoadingFeed"
-                class="feed-skeleton"
+                  v-if="friendsStore.friendsFeed.length === 0 && friendsStore.isLoadingFeed"
+                  class="feed-skeleton"
               >
-                <div class="skeleton-row" v-for="n in 5" :key="n"></div>
+                <div class="skeleton-title"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line short"></div>
               </div>
 
               <div
@@ -221,17 +226,30 @@ watch(
 }
 
 .feed-skeleton {
-  display: grid;
-  gap: 12px;
   padding: 12px 0;
 }
 
-.skeleton-row {
-  height: 22px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 37%, #2a2a2a 63%);
+.skeleton-title {
+  width: 86px;
+  height: 38px;
+  border-radius: 8px;
+  margin-bottom: 36px;
+  background: linear-gradient(90deg, #2a2f3a 25%, #3a4150 37%, #2a2f3a 63%);
   background-size: 400% 100%;
   animation: shimmer 1.2s ease infinite;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+  background: linear-gradient(90deg, #2a2f3a 25%, #3a4150 37%, #2a2f3a 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.2s ease infinite;
+}
+
+.skeleton-line.short {
+  width: 30%;
 }
 
 @keyframes shimmer {
